@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>UTM Reprojection</title>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/9.0.0/dist/ol.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/openlayers/9.0.0/ol.min.css"/>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>
+
+    <script>  
+        //Copy and pasted from ol-hsb-lib. Would be used by calling OL_HSB.utm_generator(your_epsg_num)
+        function utm_generator(epsg_num){
+            var proj4_string = ""
+        
+            //The zone is the same as the last two digits of the EPSG number
+            const zone = parseInt(String(epsg_num).substring(epsg_num.length - 2))
+        
+            if((epsg_num > 32600 && epsg_num <= 32660) || (epsg_num > 32700 && epsg_num <= 32760)){ //Northern or Southern UTM Zones respectively
+                proj4_string += "+proj=utm +zone=" + zone + " ";
+        
+                // > 32700 means it is a zone in the south
+                if(epsg_num > 32700){
+                    proj4_string += "+south ";
+                }
+        
+                proj4_string += "+datum=WGS84 +units=m +no_defs +type=crs";
+                proj4.defs("EPSG:" + epsg_num, proj4_string); //Registers the EPSG number to point to the new projection string
+                ol.proj.proj4.register(proj4);
+        
+                return "EPSG:" + epsg_num;
+            } else { 
+                console.log("Invalid EPSG number\nValid codes are between 32601-32660 and 32701-32760\nGot: " + epsg_num);
+                return "";
+            }
+        };
+    </script>
+    <link rel="stylesheet" href="./ol-hsb-lib.css"/>
+  
+    <script src="./utm_reprojection.js"></script>
+    <link rel="stylesheet" href="./utm_reprojection.css"/>
+</body>
+
+</html>
