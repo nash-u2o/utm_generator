@@ -39,6 +39,24 @@
                 console.log("Invalid EPSG number\nValid codes are between 32601-32660 and 32701-32760\nGot: " + epsg_num);
                 return "";
             }
+
+               //Gets the EPSG code from a json/geojson crs exists and "EPSG" is found in the crs. Else, default to EPSG:4326
+            function getEPSGCodeFromJSON(json){
+                const reg = RegExp("EPSG:\\d+");
+                let sourceCRS = json.crs ? json.crs.properties.name : "EPSG:4326";
+                if(sourceCRS == "EPSG:4326"){
+                    return sourceCRS;
+                } 
+
+                const cleanCRS = sourceCRS.replace(/:+/g, ":");
+                const epsgIndex = cleanCRS.search(reg);
+                if(epsgIndex == -1){
+                    return "EPSG:4326";
+                }
+
+                const epsg = cleanCRS.match(reg)[0];
+                return epsg;
+            }
         };
     </script>
     <link rel="stylesheet" href="./ol-hsb-lib.css"/>
